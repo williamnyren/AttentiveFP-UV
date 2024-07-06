@@ -1,0 +1,8 @@
+out_dim: 50
+max_wavelength: 450
+min_wavelength: 150
+peak_width: 10.0
+split_train: 0.94
+split_test: 0.01
+split_val: 0.05
+one_hot: True

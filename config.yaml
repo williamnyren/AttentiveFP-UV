@@ -1,0 +1,50 @@
+#Program to run
+program: 'train_ddp.py'
+#Sweep search method: random, grid or bayes
+method: 'random'
+
+# Project this sweep is part of
+project: 'sweep_large'
+entity: 'nyrenw'
+
+# Metric to optimize
+metric:
+  name: 'val_srmse'
+  goal: 'minimize'
+
+# Parameters search space
+parameters:
+  lr: 
+    values: [0.0001]
+  hidden_channels:
+    values: [600]
+  num_layers:
+    values: [8]
+  num_timesteps:
+    values: [2]
+  dropout:
+    values: [0.05]
+  num_workers:
+    value: 3
+  total_epochs:
+    value: 50
+  warmup_epochs:
+    value: 2
+  batch_size:
+    values: [0]
+  Attention_mode:
+    values: ['GATv2']
+  heads: 
+    values: [3]
+  loss_function:
+    values: ['mse_loss']
+  with_fake_edges: 
+    value: 0
+  lr_ddp_scaling:
+    value: 0
+  batch_ddp_scaling:
+    value: 1
+  savitzkey_golay:
+    values: [0]
+#  seed:
+#    values: [42, 13, 7]
