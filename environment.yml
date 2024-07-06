@@ -1,0 +1,21 @@
+name: attentive_fp_test
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - yaml
+  - ipykernel
+  - pip
+  - pip:
+      - matplotlib==3.8.4
+      - numpy==2.0.0
+      - pandas==2.2.2
+      - plotnine==0.13.5
+      - PyYAML==6.0.1
+      - rdkit==2023.9.6
+      - scipy==1.14.0
+      - seaborn==0.13.2
+      - setuptools==68.2.2
+      - tqdm==4.66.4
+      - torch_geometric==2.5.3
+      - wandb
