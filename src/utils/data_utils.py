@@ -133,11 +133,12 @@ class GenSplit():
         
     """
     def __init__(self, root = 'split_dict.pt', num_molecules = 10582578 ,split = [0.8, 0.1, 0.1], force_recreate = False):
-        if osp.exists(root) and not force_recreate:
+        root_dirs = [osp.join(root, split_name, 'data/raw/data/split_dict.pt') for split_name in ['train', 'val', 'test']]
+        if all([osp.exists(root_dir) for root_dir in root_dirs]) and not force_recreate:
             logging.info('Split already exists. Skipping...')
             return
         else:
-            os.makedirs(osp.dirname(root), exist_ok=True)
+            logging.info('Creating splits...')
         self.num_molecules = num_molecules-1
         self.split = split
         assert sum(split) == 1
@@ -148,8 +149,7 @@ class GenSplit():
         split_dict = {'train': self.indices[0:int(num_molecules*split[0])],
                       'valid': self.indices[int(num_molecules*split[0]):int(num_molecules*(split[0]+split[1]))],
                       'test': self.indices[int(num_molecules*(split[0]+split[1])):]}
-        for split_name in ['train', 'val', 'test']:
-            root = osp.join(root, split_name, 'data/raw/data/split_dict.pt')
+        for root in root_dirs:
             torch.save(split_dict, root)
 
 def search_for_dots(smis):

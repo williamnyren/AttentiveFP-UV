@@ -53,7 +53,7 @@ def process_split_set(data_path, num_molecules, config, force_recreate=False):
     
     if not (os.path.exists(split_dict_path_train) and os.path.exists(split_dict_path_val) and os.path.exists(split_dict_path_test)) or force_recreate:
         split = [config['split_train'], config['split_val'], config['split_test']]
-        split_dict_path = f'/{data_path}'
+        split_dict_path = f'{data_path}'
         logging.info(f"Generating splits with {num_molecules} molecules in total...")
         GenSplit(root=split_dict_path, num_molecules=num_molecules, split=split, force_recreate=force_recreate)
         logging.info(f"Splits generated successfully and saved to {split_dict_path}.")
@@ -71,7 +71,7 @@ def create_datasets(split_sets, data_path, config_spectra):
 def main():
     parser = argparse.ArgumentParser(description='Process some paths for data preparation.')
     parser.add_argument('--data_path', type=str, default='data',
-                        help='Path to the data directory (default: nvme_king/data)')
+                        help='Path to the data directory (default: data)')
     parser.add_argument('--config_path', type=str, default='src/config/config_spectra.yml',
                         help='Path to the configuration file (default: src/config/config_spectra.yml)')
     parser.add_argument('--raw_data_path', type=str, default='ORNL_data',
