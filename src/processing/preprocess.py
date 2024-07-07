@@ -46,12 +46,15 @@ def copy_dataframe_to_split_dirs(data_path, root_df, split_sets):
         else:
             logging.info(f"Dataframe already exists in {split_set} directory at {dest_path}.")
 
-def process_split_set(split_set, data_path, num_molecules):
-    split_dict_path = f'./{data_path}/{split_set}/data/raw/data/split_dict.pt'
-
-    if not os.path.exists(split_dict_path):
+def process_split_set(data_path, num_molecules, config, force_recreate=False):
+    split_dict_path_train = f'./{data_path}/train/data/raw/data/split_dict.pt'
+    split_dict_path_val = f'./{data_path}/val/data/raw/data/split_dict.pt'
+    split_dict_path_test = f'./{data_path}/test/data/raw/data/split_dict.pt'
+    
+    if not (os.path.exists(split_dict_path_train) and os.path.exists(split_dict_path_val) and os.path.exists(split_dict_path_test)) or force_recreate:
+        split = [config['split_train'], config['split_val'], config['split_test']]
         logging.info(f"Generating split for {split_set} with {num_molecules} molecules...")
-        GenSplit(root=split_dict_path, num_molecules=num_molecules, split=[0.94, 0.01, 0.05])
+        GenSplit(root=split_dict_path, num_molecules=num_molecules, split=split, force_recreate=force_recreate)
         logging.info(f"Split for {split_set} generated successfully and saved to {split_dict_path}.")
     else:
         logging.info(f"Split for {split_set} already exists at {split_dict_path}.")
@@ -72,6 +75,8 @@ def main():
                         help='Path to the configuration file (default: ./config/config_spectra.yml)')
     parser.add_argument('--raw_data_path', type=str, default='./ORNL_data',
                         help='Path to the raw data directory (default: ./ORNL_data)')
+    parser.add_argument('--force_recreate', action='store_true', default=False, 
+                        help='Force recreate split_dict.pt')
 
     args = parser.parse_args()
 
@@ -88,8 +93,7 @@ def main():
     num_molecules, root_df = create_dataframe_if_needed(data_path, raw_data_path, config_path)
     copy_dataframe_to_split_dirs(data_path, root_df, split_sets)
 
-    for split_set in split_sets:
-        process_split_set(split_set, data_path, num_molecules)
+    process_split_set(data_path, num_molecules, config_spectra, force_recreate=force_recreate)
 
     create_datasets(split_sets, data_path, config_spectra)
 

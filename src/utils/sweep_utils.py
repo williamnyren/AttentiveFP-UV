@@ -111,6 +111,6 @@ def find_batch_size(_model, device, gpu_id, on_disk_data):
         time.sleep(0.25)
         torch.cuda.empty_cache()
         
-    logging.info(f'Max batch size: {batch_size}', f'Max memory usage: {mem_usage_max}', f'Memory usage (current): {mem_usage}')
+    logging.info(f'Max batch size: {batch_size}, Max memory usage: {mem_usage_max}, Memory usage (current): {mem_usage}')
 
     return batch_size

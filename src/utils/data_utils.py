@@ -141,12 +141,16 @@ class GenSplit():
         self.num_molecules = num_molecules-1
         self.split = split
         assert sum(split) == 1
-        
         self.indices = torch.arange(num_molecules)
+        if force_recreate:
+            #Shuffle the indices
+            self.indices = self.indices[torch.randperm(num_molecules)]
         split_dict = {'train': self.indices[0:int(num_molecules*split[0])],
                       'valid': self.indices[int(num_molecules*split[0]):int(num_molecules*(split[0]+split[1]))],
                       'test': self.indices[int(num_molecules*(split[0]+split[1])):]}
-        torch.save(split_dict, root)
+        for split_name in ['train', 'val', 'test']:
+            root = osp.join('./{data_path}', split_name, 'data/raw/data/split_dict.pt')
+            torch.save(split_dict, root)
 
 def search_for_dots(smis):
     df_lst_reject = []

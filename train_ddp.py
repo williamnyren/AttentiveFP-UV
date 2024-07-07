@@ -201,7 +201,7 @@ def load_model(model, total_epochs, map_location=None, checkpoint_file=None, ran
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     total_epochs = total_epochs + epoch
-    print(f'Loaded model from checkpoint: {file}')
+    logging.info(f'Loaded model from checkpoint: {file}')
     if rank == 0:
         #best_val_metric = checkpoint['loss']
         return model, optimizer, epoch, total_epochs, 999999#best_val_metric
@@ -230,7 +230,7 @@ def maximize_batch_size(rank, result_queue):
     data_tmp = DatasetAttentiveFP(root=path_tmp, split='test', one_hot=config_spectra['one_hot'], config=config_spectra)
     batch_size = find_batch_size(model, device, gpu_id, data_tmp)
     result_queue.put(batch_size)
-    print(f"Maximized batch size: {batch_size}")
+    logging.info(f"Maximized batch size: {batch_size}")
     del model
     del data_tmp
     del device
@@ -300,15 +300,15 @@ class SpectralTrainer:
         
 
     def setup_data_loaders(self):
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
-        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
+        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
-        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
+        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
-        self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
+        self.test_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
         self.train_loader = DataLoader(self.train_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.train_data))
         self.val_loader = DataLoader(self.val_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.val_data))
@@ -553,6 +553,7 @@ if __name__ == "__main__":
     max_batch_size = result_queue.get()
     if max_batch_size < default_config['batch_size'] or default_config['batch_size'] == 0:
         default_config['batch_size'] = max_batch_size
+    logging.info(f'Batch size set for training: {default_config["batch_size"]}')
 
     world_size = torch.cuda.device_count()
     default_config['NUM_PROCESSES'] = world_size
