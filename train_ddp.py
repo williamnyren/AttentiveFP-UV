@@ -224,9 +224,7 @@ def maximize_batch_size(rank, result_queue):
     gpu_id = rank
     device = torch.device(f'cuda:{gpu_id}')
     path_tmp = os.path.join(PERSISTENT_STORAGE_PATH, default_config['DATA_DIRECTORY'], 'test', 'data')
-    path_tmp_split = os.path.join(path_tmp, 'raw', 'data', 'split_dict.pt')
     split = [config_spectra['split_train'], config_spectra['split_val'], config_spectra['split_test']]
-    GenSplit(root= path_tmp_split, split=split)
     data_tmp = DatasetAttentiveFP(root=path_tmp, split='test', one_hot=config_spectra['one_hot'], config=config_spectra)
     batch_size = find_batch_size(model, device, gpu_id, data_tmp)
     result_queue.put(batch_size)
@@ -300,14 +298,11 @@ class SpectralTrainer:
         
 
     def setup_data_loaders(self):
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
-        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
         self.train_loader = DataLoader(self.train_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.train_data))
