@@ -1,5 +1,13 @@
 # AttentiveFP-UV
 
+## Table of Contents
+- [Project Overview](#project-overview)
+  - [Background](#background)
+  - [Goals and Objectives](#goals-and-objectives)
+- [Setup](#setup)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+
 ## Project Overview
 
 Built around the model AttentiveFP provided by PyG ([PyTorch Geometric](https://pytorch-geometric.readthedocs.io/)), this project aims to train versions of the model to predict the UV-absorption spectra in organic molecules. The dataset is provided by Oak Ridge National Laboratory (ORNL), which includes a wide range of organic molecules and their corresponding UV-Vis absorption spectra.
