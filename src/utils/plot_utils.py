@@ -7,6 +7,11 @@ from plotnine import (ggplot, aes, geom_density, geom_vline, labs, theme_minimal
                       theme, element_text, scale_x_continuous, geom_text)
 import warnings
 import time
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s - [%(filename)s:%(lineno)d]')
+
+
 warnings.filterwarnings("ignore")
 
 def make_density_plot(df, config, script_path):
@@ -16,7 +21,7 @@ def make_density_plot(df, config, script_path):
     quantiles = []
     quantiles_lst = [0.25, 0.5, 0.75, 0.95]
     # Use a subsample of the data to speed up the plot
-    df = df.sample(n=15000)
+    #df = df.sample(n=15000)
     for q in quantiles_lst: 
         quantiles.append(df['loss'].quantile(q))
     mean = df['loss'].mean()
@@ -41,7 +46,7 @@ def make_density_plot(df, config, script_path):
     # Save the plot
     p.save(os.path.join(script_path, 'plots', 'density_plot.png'), width=8, height=6, dpi=300, units='in')
     time_end = time.time()
-    print(f"Time taken to generate density plot: {time_end - time_start:.2f} seconds")
+    logging.info(f"Time taken to generate density plot: {time_end - time_start:.2f} seconds")
     return 'density_plot.png'
 
 
@@ -142,9 +147,9 @@ def make_subplot_v2(predictions, config, process_dir=None):
     if process_dir is not None:
         pickle.dump(fig, open(os.path.join(process_dir, 'plots','subplots.pkl'), 'wb'))
         time_end = time.time()
-        print(f"Time taken to generate subplots: {time_end - time_start:.2f} seconds")
+        logging.info(f"Time taken to generate subplots: {time_end - time_start:.2f} seconds")
         return None
     else:
         time_end = time.time()
-        print(f"Time taken to generate subplots: {time_end - time_start:.2f} seconds")
+        logging.info(f"Time taken to generate subplots: {time_end - time_start:.2f} seconds")
         return fig

@@ -6,13 +6,18 @@ from torch_geometric.loader import DataLoader
 from src.utils.data_utils import DatasetAttentiveFP, GenSplit
 from src.models.AttentiveFP_v2 import AttentiveFP
 import time
+import logging
+
+
+# Configure logging to include line number
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s - [%(filename)s:%(lineno)d]')
 
 
 
 # Function to get memory usage of a GPU
 def get_memory_usage(device, gpu_id):
     if device == 'cpu':
-        print('CPU memory usage not supported')
+        logging.info('CPU memory usage not supported')
         raise NotImplementedError
     else:
         # Use nvidia-smi to get the memory usage information
@@ -40,7 +45,7 @@ def get_memory_usage(device, gpu_id):
 def find_batch_size(_model, device, gpu_id, on_disk_data):
     # Get initial memory usage and capacity
     mem_usage, mem_capacity = get_memory_usage(device, gpu_id)
-    print(f'Memory capacity: {mem_capacity}')
+    logging.info(f'Memory capacity: {mem_capacity}')
     
     batch_size = 64  # Start with an initial batch size
     num_trys = 0  # Counter to limit the number of tries
@@ -106,6 +111,6 @@ def find_batch_size(_model, device, gpu_id, on_disk_data):
         time.sleep(0.25)
         torch.cuda.empty_cache()
         
-    print(f'Max batch size: {batch_size}', f'Max memory usage: {mem_usage_max}', f'Memory usage (current): {mem_usage}')
+    logging.info(f'Max batch size: {batch_size}', f'Max memory usage: {mem_usage_max}', f'Memory usage (current): {mem_usage}')
 
     return batch_size

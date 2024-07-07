@@ -5,7 +5,7 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 import numpy as np
 
-def build_lr_scheduler(optimizer: Optimizer, config) -> _LRScheduler:
+def build_lr_scheduler(optimizer: Optimizer, config, num_train_samples) -> _LRScheduler:
     """
     Builds a learning rate scheduler.
 
@@ -19,10 +19,10 @@ def build_lr_scheduler(optimizer: Optimizer, config) -> _LRScheduler:
         optimizer=optimizer,
         warmup_epochs=[config['warmup_epochs']],
         total_epochs=[config['total_epochs']],
-        steps_per_epoch=[9947500 // config['batch_size']],
-        init_lr=[config['lr']/10000],
+        steps_per_epoch=[num_train_samples // config['batch_size']],
+        init_lr=[config['init_lr']],#[config['lr']/10000],
         max_lr=[config['lr']],
-        final_lr=[config['lr']/100]
+        final_lr=[config['final_lr']]#[config['lr']/100]
     )
 
 

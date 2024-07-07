@@ -85,6 +85,8 @@ PERSISTENT_STORAGE_PATH = '/home/nyrenw/AttentiveFP-UV'
 
 default_config = {
     'lr': 5e-4,
+    'init_lr': 5e-8,
+    'final_lr': 5e-6,
     'hidden_channels': 250,
     'num_layers': 4,
     'num_timesteps': 2,
@@ -122,7 +124,9 @@ default_config = {
 def parse_args():
     "Overriding default parameters"
     argparser = argparse.ArgumentParser(description='Process hyperparameters')
-    argparser.add_argument('--lr', type=float, default=default_config['lr'], help='Learning rate')
+    argparser.add_argument('--lr', type=float, default=default_config['lr'], help='Learning rate (Max learning rate)')
+    argparser.add_argument('--init_lr', type=float, default=default_config['init_lr'], help='Initial learning rate')
+    argparser.add_argument('--final_lr', type=float, default=default_config['final_lr'], help='Final learning rate')
     argparser.add_argument('--hidden_channels', type=int, default=default_config['hidden_channels'], help='Hidden channels')
     argparser.add_argument('--num_layers', type=int, default=default_config['num_layers'], help='Number of layers')
     argparser.add_argument('--num_timesteps', type=int, default=default_config['num_timesteps'], help='Number of timesteps')
@@ -258,7 +262,7 @@ class SpectralTrainer:
             self.best_val_acc = 999999
             self.run_wandb = setup_wandb(config, rank)
             self.epoch = self.run_wandb.step
-            print(f"Resuming training from epoch {self.epoch}")
+            logging.info(f"Training from epoch {self.epoch}")
         dist.barrier()
         if config['run_id'] is not None:
             if rank == 0:
@@ -279,15 +283,14 @@ class SpectralTrainer:
         else:               
             self.model = model.to(rank)
             self.optimizer = torch.optim.AdamW(model.parameters(), lr=config['lr'], weight_decay=4.e-4)
-        self.scheduler = build_lr_scheduler(self.optimizer, config)
         self.model = DDP(model, device_ids=[rank])
         self.setup_data_loaders()
+        self.scheduler = build_lr_scheduler(self.optimizer, config, self.num_train_samples)
         self.loss_function = get_spectral_fn(config['loss_function'], epoch = self.epoch, warmup_epochs = self.warmup_epochs)
         self.metric = get_spectral_fn(config['metric'])
         self.filters = []
-        print(config['savitzkey_golay'])
         for deriv in config['savitzkey_golay']:
-            print(f"Initializing Savitzkey Golay filter with deriv={deriv}")
+            logging.info(f"Initializing Savitzkey Golay filter with deriv={deriv}")
             if deriv == 0:
                 continue
             self.filters.append(initialize_savgol_filter(self.device, window_length=config['window_length'],
@@ -299,13 +302,14 @@ class SpectralTrainer:
     def setup_data_loaders(self):
         GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
-        
+        logging.info(f'Number of training samples: {len(self.train_data)}')
+        self.num_train_samples = len(self.train_data)
         GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
-        
+        logging.info(f'Number of validation samples: {len(self.val_data)}')
         GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
         self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
-
+        logging.info(f'Number of test samples: {len(self.test_data)}')
         self.train_loader = DataLoader(self.train_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.train_data))
         self.val_loader = DataLoader(self.val_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.val_data))
         self.test_loader = DataLoader(self.test_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.test_data))
@@ -405,7 +409,7 @@ class SpectralTrainer:
         return fig, density_fig_name
 
     def run_training(self, total_epochs):
-        print(f"Ready for training on GPU:{self.rank}")
+        logging.info(f"Ready for training on GPU:{self.rank}")
         dist.barrier()
         # Flag tensor for early stopping of all processes
         break_flag = torch.zeros(1).to(self.device)
@@ -417,13 +421,11 @@ class SpectralTrainer:
                 self.loss_function = get_spectral_fn(self.config['loss_function'], epoch = epoch)
             _train_average_metric = torch.zeros(1).to(self.device)                    
             _train_average_metric += self.train(epoch) 
-            print(f"Before all_reduce: Epoch {epoch} | Training metric: {_train_average_metric}")
             dist.all_reduce(_train_average_metric, op=dist.ReduceOp.SUM)
             if self.rank == 0:
                 image_log = False
                 train_average_metric = _train_average_metric / self.config['NUM_PROCESSES']
 
-                print(f"After all_reduce: Epoch {epoch} | Training metric: {train_average_metric}")
                 validate_average_metric = self.validate(epoch)
                 lr = get_lr(self.optimizer)
                 if validate_average_metric < self.best_val_acc:
@@ -457,12 +459,14 @@ class SpectralTrainer:
             dist.all_reduce(break_flag, op=dist.ReduceOp.SUM)
             if break_flag == 1:
                 break
+            """
             dist.all_reduce(lr_reduce_flag, op=dist.ReduceOp.SUM)
             if lr_reduce_flag == 1:
                 lr_reduce_flag *= 0
                 if self.scheduler is not None:
                     for param_group in self.optimizer.param_groups:
                         param_group['lr'] = param_group['lr'] / 2
+            """
             
             dist.barrier()
         return
@@ -477,7 +481,7 @@ class SpectralTrainer:
                     'model_state_dict': ckp_m,
                     'optimizer_state_dict': ckp_op},
                    checkpoint_file)    
-        print(f"Epoch {epoch} | Training checkpoint saved at {checkpoint_file}")
+        logging.info(f"Epoch {epoch} | Training checkpoint saved at {checkpoint_file}")
     
 
 def load_config_and_initialize(rank: int, config: dict):
@@ -495,9 +499,9 @@ def load_config_and_initialize(rank: int, config: dict):
     
     if not os.path.exists(os.path.join(process_dir, config['DATA_DIRECTORY'], 'train', 'data', 'processed', 'sqlite.db')):
         persistent_data = os.path.join(PERSISTENT_STORAGE_PATH, config['DATA_DIRECTORY'])
-        print(f"Copying data from {persistent_data} to {process_dir}")
+        logging.info(f"Copying data from {persistent_data} to {process_dir}")
         os.system(f'cp -r {persistent_data} {process_dir}')
-        print(f"Transfer complete for process {rank}")
+        logging.info(f"Transfer complete for process {rank}")
 
     dataset_paths = {
         'train': os.path.join(process_dir, config['DATA_DIRECTORY'], 'train', 'data'),
@@ -536,14 +540,14 @@ def main(rank, world_size, config):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        print(f"Error in process {rank} | {e}")
+        logging.info(f"Error in process {rank} | {e}")
     finally:
         dist.barrier()
         dist.destroy_process_group()
 
 if __name__ == "__main__":
     parse_args()
-    print("Maximizing batch size before starting multi-processing for DDP.")
+    logging.info("Maximizing batch size before starting multi-processing for DDP.")
     result_queue = mp.Queue()
     mp.Process(target=maximize_batch_size, args=(0, result_queue)).start()
     max_batch_size = result_queue.get()
@@ -552,14 +556,14 @@ if __name__ == "__main__":
 
     world_size = torch.cuda.device_count()
     default_config['NUM_PROCESSES'] = world_size
-    
-    
-    print(default_config['lr_ddp_scaling'], default_config['batch_ddp_scaling'])
-    assert default_config['lr_ddp_scaling'] != default_config['batch_ddp_scaling']
-    if default_config['lr_ddp_scaling']:
-        default_config['lr'] = default_config['lr'] * np.sqrt(world_size)
-    elif default_config['batch_ddp_scaling'] == 1:
-        default_config['batch_size'] = int(default_config['batch_size'] / world_size)
+    logging.info(f'Number of GPUs and processes to train the model: {world_size}')
+    if world_size > 1:
+        logging.info(f'Scaling ether batch size or learning rate when using multiple GPUs.')
+        assert default_config['lr_ddp_scaling'] != default_config['batch_ddp_scaling']
+        if default_config['lr_ddp_scaling']:
+            default_config['lr'] = default_config['lr'] * np.sqrt(world_size)
+        elif default_config['batch_ddp_scaling'] == 1:
+            default_config['batch_size'] = int(default_config['batch_size'] / world_size)
         
     correct_wandb_list_args()
     mp.spawn(main, args=(world_size, default_config), nprocs=world_size)
