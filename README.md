@@ -39,7 +39,7 @@ Follow these steps to set up your environment and install all necessary dependen
 
 2. **Create and Activate the Conda Environment**
 
-This will create the environment and install all conda and pip dependencies specified in the environment.yml file.
+   This will create the environment and install all conda and pip dependencies specified in the environment.yml file.
 
    ```bash
       conda env create -f environment.yml
@@ -56,10 +56,10 @@ This will create the environment and install all conda and pip dependencies spec
    ```
 4. **Run the postBuild Script**
 
-Execute the script to complete the installation of the required packages.
+   Execute the script to complete the installation of the required packages.
 
    ```bash
       ./postBuild
    ```
 
-By following these steps, you will set up your development environment with all the necessary dependencies to run the AttentiveFP-UV project.
+   By following these steps, you will set up your development environment with all the necessary dependencies to run the AttentiveFP-UV project.
