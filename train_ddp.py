@@ -300,15 +300,15 @@ class SpectralTrainer:
         
 
     def setup_data_loaders(self):
-        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
-        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
+        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
-        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
+        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
-        GenSplit(root=self.dataset_paths['val_split'], split=self.config['split'])
-        self.test_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
+        GenSplit(root=self.dataset_paths['test_split'], split=self.config['split'])
+        self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
         self.train_loader = DataLoader(self.train_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.train_data))
         self.val_loader = DataLoader(self.val_data, batch_size=self.config['batch_size'], pin_memory=True, drop_last=True, shuffle = False, sampler=DistributedSampler(self.val_data))
