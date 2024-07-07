@@ -7,6 +7,7 @@
 - [Setup](#setup)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+- [Retrieving the Dataset](#retrieving-the-dataset)
 - [Training the Model](#training-the-model)
   - [Using Command Line Arguments](#using-command-line-arguments)
   - [Using a WandB Config File](#using-a-wandb-config-file)
@@ -75,6 +76,40 @@ Follow these steps to set up your environment and install all necessary dependen
    ```
 
    By following these steps, you will set up your development environment with all the necessary dependencies to run the AttentiveFP-UV project.
+
+## Retrieving the Dataset
+
+   To retrieve the dataset required for this project, follow these detailed steps:
+
+### Based on the Work Here
+   Refer to the article [Two excited-state datasets for quantum chemical UV-vis spectra of organic molecules](https://www.nature.com/articles/s41597-023-02408-4#Sec10).
+
+### Steps to Download the Dataset
+
+   1. **Go to the ORNL Data Transfer Guide**
+      - Follow the instructions on how to install and use Globus from the ORNL Data Transfer Guide: 
+         - [Data Transferring Guide](https://docs.olcf.ornl.gov/data/index.html#data-transferring-data)
+
+   2. **Install Globus**
+      - Download and install the Globus app from the official Globus site:
+         - [Globus Download Site](https://app.globus.org/collections/gcp)
+
+   3. **Connect to Globus**
+      - Open the Globus app and sign in using your credentials. Follow the on-screen instructions to connect to the Globus file transfer service.
+
+   4. **Locate the Files on Globus**
+      - The files to transfer on Globus can be found via the references in the article:
+         - Yoo, P., Lupo Pasini, M., Mehta, K. & Irle, S. Supplementary material for GDB-9-Ex. OSTI.gov [DOI](https://doi.org/10.13139/OLCF/1985521) (2023).
+         - Yoo, P., Lupo Pasini, M., Mehta, K. & Irle, S. Supplementary material for ORNL_AISD-Ex. OSTI.gov [DOI](https://doi.org/10.13139/OLCF/1985737) (2023).
+
+   5. **Transfer the Files**
+      - Ensure that you are connected to Globus in the installed app.
+      - Navigate to the file you want to download from Globus via the references mentioned above.
+      - Select a directory on your local system where you want to transfer the files.
+      - Follow the instructions in the Globus app to initiate and complete the file transfer.
+
+   By following these steps, you will be able to download the dataset required for this project.
+
 
 ## Training the Model
    Train the model using command line arguments or using a WandB configuration file. You can 

@@ -97,7 +97,7 @@ default_config = {
     'warmup_epochs': 1,
     'run_id': None,
     'batch_size': 0,
-    'Attention_mode': 'GAT',
+    'Attention_mode': 'MoGATv2',
     'heads': 2,
     'loss_function': 'mse_loss',
     'metric': 'srmse',
@@ -224,7 +224,6 @@ def maximize_batch_size(rank, result_queue):
     gpu_id = rank
     device = torch.device(f'cuda:{gpu_id}')
     path_tmp = os.path.join(PERSISTENT_STORAGE_PATH, default_config['DATA_DIRECTORY'], 'test', 'data')
-    split = [config_spectra['split_train'], config_spectra['split_val'], config_spectra['split_test']]
     data_tmp = DatasetAttentiveFP(root=path_tmp, split='test', one_hot=config_spectra['one_hot'], config=config_spectra)
     batch_size = find_batch_size(model, device, gpu_id, data_tmp)
     result_queue.put(batch_size)
@@ -298,10 +297,10 @@ class SpectralTrainer:
         
 
     def setup_data_loaders(self):
-        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['train'], split='train', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
         self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
