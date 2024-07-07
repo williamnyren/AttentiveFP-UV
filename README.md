@@ -23,15 +23,43 @@ The main objectives of this project are:
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.11+
 - [Anaconda](https://www.anaconda.com/products/individual)
-- PyTorch
-- PyTorch Geometric
 
 ### Installation
+
+Follow these steps to set up your environment and install all necessary dependencies:
 
 1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/your-username/AttentiveFP-UV.git
    cd AttentiveFP-UV
+   
+
+2. **Create and Activate the Conda Environment**
+
+This will create the environment and install all conda and pip dependencies specified in the environment.yml file.
+
+´´´bash
+   conda env create -f environment.yml
+   conda activate attentive_fp_test
+´´´
+
+
+3. **Make the postBuild Script Executable**
+
+   The postBuild script is used to install PyTorch, torchvision, and torchaudio with the specified CUDA version.
+
+   ´´´bash
+      chmod +x postBuild
+   ´´´
+   Run the postBuild Script
+
+Execute the script to complete the installation of the required packages.
+
+´´´bash
+   ./postBuild
+´´´
+
+By following these steps, you will set up your development environment with all the necessary dependencies to run the AttentiveFP-UV project.
