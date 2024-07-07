@@ -54,7 +54,7 @@ This will create the environment and install all conda and pip dependencies spec
    ```bash
       chmod +x postBuild
    ```
-   Run the postBuild Script
+4. **Run the postBuild Script**
 
 Execute the script to complete the installation of the required packages.
 
