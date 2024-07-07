@@ -47,21 +47,22 @@ def copy_dataframe_to_split_dirs(data_path, root_df, split_sets):
             logging.info(f"Dataframe already exists in {split_set} directory at {dest_path}.")
 
 def process_split_set(data_path, num_molecules, config, force_recreate=False):
-    split_dict_path_train = f'./{data_path}/train/data/raw/data/split_dict.pt'
-    split_dict_path_val = f'./{data_path}/val/data/raw/data/split_dict.pt'
-    split_dict_path_test = f'./{data_path}/test/data/raw/data/split_dict.pt'
+    split_dict_path_train = f'{data_path}/train/data/raw/data/split_dict.pt'
+    split_dict_path_val = f'{data_path}/val/data/raw/data/split_dict.pt'
+    split_dict_path_test = f'{data_path}/test/data/raw/data/split_dict.pt'
     
     if not (os.path.exists(split_dict_path_train) and os.path.exists(split_dict_path_val) and os.path.exists(split_dict_path_test)) or force_recreate:
         split = [config['split_train'], config['split_val'], config['split_test']]
-        logging.info(f"Generating split for {split_set} with {num_molecules} molecules...")
+        split_dict_path = f'/{data_path}'
+        logging.info(f"Generating splits with {num_molecules} molecules in total...")
         GenSplit(root=split_dict_path, num_molecules=num_molecules, split=split, force_recreate=force_recreate)
-        logging.info(f"Split for {split_set} generated successfully and saved to {split_dict_path}.")
+        logging.info(f"Splits generated successfully and saved to {split_dict_path}.")
     else:
-        logging.info(f"Split for {split_set} already exists at {split_dict_path}.")
+        logging.info(f"Splits already exists at {split_dict_path_train}, {split_dict_path_val}, {split_dict_path_test}.")
 
 def create_datasets(split_sets, data_path, config_spectra):
     for split_set in split_sets:
-        root = f'./{data_path}/{split_set}/data/'
+        root = f'{data_path}/{split_set}/data/'
         os.makedirs(root, exist_ok=True)
         logging.info(f"Executing DatasetAttentiveFP() for {split_set}...")
         DatasetAttentiveFP(root=root, split=split_set, one_hot=True, config=config_spectra, add_fake_edges=True)
@@ -69,12 +70,12 @@ def create_datasets(split_sets, data_path, config_spectra):
 
 def main():
     parser = argparse.ArgumentParser(description='Process some paths for data preparation.')
-    parser.add_argument('--data_path', type=str, default='nvme_king/data',
+    parser.add_argument('--data_path', type=str, default='data',
                         help='Path to the data directory (default: nvme_king/data)')
-    parser.add_argument('--config_path', type=str, default='./config/config_spectra.yml',
-                        help='Path to the configuration file (default: ./config/config_spectra.yml)')
-    parser.add_argument('--raw_data_path', type=str, default='./ORNL_data',
-                        help='Path to the raw data directory (default: ./ORNL_data)')
+    parser.add_argument('--config_path', type=str, default='src/config/config_spectra.yml',
+                        help='Path to the configuration file (default: src/config/config_spectra.yml)')
+    parser.add_argument('--raw_data_path', type=str, default='ORNL_data',
+                        help='Path to the raw data directory (default: ORNL_data)')
     parser.add_argument('--force_recreate', action='store_true', default=False, 
                         help='Force recreate split_dict.pt')
 
@@ -84,6 +85,7 @@ def main():
     data_path = args.data_path
     config_path = args.config_path
     raw_data_path = args.raw_data_path
+    force_recreate = args.force_recreate
 
     config_spectra = load_config(config_path)
     logging.info(f"Configuration loaded from {config_path}.")

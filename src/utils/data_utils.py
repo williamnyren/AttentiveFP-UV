@@ -149,7 +149,7 @@ class GenSplit():
                       'valid': self.indices[int(num_molecules*split[0]):int(num_molecules*(split[0]+split[1]))],
                       'test': self.indices[int(num_molecules*(split[0]+split[1])):]}
         for split_name in ['train', 'val', 'test']:
-            root = osp.join('./{data_path}', split_name, 'data/raw/data/split_dict.pt')
+            root = osp.join(root, split_name, 'data/raw/data/split_dict.pt')
             torch.save(split_dict, root)
 
 def search_for_dots(smis):
