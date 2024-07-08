@@ -413,7 +413,7 @@ class SpectralTrainer:
                 if validate_average_metric < self.best_val_acc:
                     patience = 6
                     self.best_val_acc = validate_average_metric
-                    self.save_checkpoint(epoch)
+                    self.save_checkpoint(epoch, self.config)
                     
                     fig, density_fig_name = self.test(epoch)
                     data = {'val': validate_average_metric,
