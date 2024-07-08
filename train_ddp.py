@@ -463,7 +463,7 @@ class SpectralTrainer:
         with open(os.path.join(checkpoint_path, f'config_{checkpoint_file}.pkl'), 'wb') as f:
             pickle.dump(config, f)
         
-        checkpoint_file = os.path.join(checkpoint_path, checkpoint_file, f'checkpoint_{checkpoint_file}.pt')
+        checkpoint_file = os.path.join(checkpoint_path, f'checkpoint_{checkpoint_file}.pt')
         ckp_m = self.model.module.state_dict()
         ckp_op = self.optimizer.state_dict()
         torch.save({'epoch': epoch,
