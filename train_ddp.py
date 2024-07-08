@@ -454,13 +454,13 @@ class SpectralTrainer:
         assert self.rank == 0
         
         checkpoint_file = self.run_wandb.id
-        checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models')
+        checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models', checkpoint_file)
         
         # Make directory if it does not exist
         if not os.path.exists(checkpoint_path):
-            os.makedirs(os.path.join(checkpoint_path, checkpoint_file), exist_ok=True)
+            os.makedirs(os.path.join(checkpoint_path), exist_ok=True)
 
-        with open(os.path.join(checkpoint_path, checkpoint_file, f'config_{checkpoint_file}.pkl'), 'wb') as f:
+        with open(os.path.join(checkpoint_path, f'config_{checkpoint_file}.pkl'), 'wb') as f:
             pickle.dump(config, f)
         
         checkpoint_file = os.path.join(checkpoint_path, checkpoint_file, f'checkpoint_{checkpoint_file}.pt')
