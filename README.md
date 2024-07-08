@@ -60,9 +60,9 @@ Follow these steps to set up your environment and install all necessary dependen
    ```
 
 
-3. **Make the postBuild Script Executable**
+3. **Make the `postBuild` Script Executable**
 
-   The postBuild script is used to install PyTorch, torchvision, and torchaudio with the specified CUDA version.
+   The `postBuild` script is used to install `PyTorch`, `torchvision`, and `torchaudio` with the specified CUDA version.
 
    ```bash
       chmod +x postBuild
@@ -108,8 +108,8 @@ Follow these steps to set up your environment and install all necessary dependen
       - Select a directory on your local system where you want to transfer the files.
       - Follow the instructions in the Globus app to initiate and complete the file transfer.
    
-   6. **Extract data files and direcories**
-      - Extract the two files transfered from Globus and put them in to the directory `ORNL_data`
+   6. **Extract data files and directories**
+      - Extract the two files transferred from Globus and put them into the directory `ORNL_data`
       ```
          - ORNL_data
             - extracted
@@ -126,10 +126,8 @@ Follow these steps to set up your environment and install all necessary dependen
    Train the model using command line arguments or using a WandB configuration file. You can 
 ### Using Command Line Arguments
    Override the default parameters directly through command line arguments.
-   python like display in README.md github file
+   Defaults:
    ```
-      import argparse
-
    default_config = {
       'lr': 5e-4,
       'hidden_channels': 250,
@@ -206,7 +204,7 @@ Follow these steps to set up your environment and install all necessary dependen
    ```
       #Program to run
       program: 'train_ddp.py'
-      #Sweep search method: random, grid or bayes
+      #Sweep search method: random, grid or Bayes
       method: 'random'
 
       # Project this sweep is part of
@@ -260,7 +258,7 @@ Follow these steps to set up your environment and install all necessary dependen
    ```
       wandb sweep config.yaml
    ```
-   You should now recive a <sweep-ID> in the terminal. THe project and sweep should also be pressent on you W&B page.
+   You should now receive a <sweep-ID> in the terminal. The project and sweep should also be present on your W&B page.
 
    We are now able to start a new run in the sweep:
    ```
