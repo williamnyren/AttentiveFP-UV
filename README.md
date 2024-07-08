@@ -8,6 +8,9 @@
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Retrieving the Dataset](#retrieving-the-dataset)
+  -[Steps to Download the Dataset](#download-the-dataset) 
+  -[Preprocess the dataset and prepare it before training the model](#preprocess-the-dataset) 
+
 - [Training the Model](#training-the-model)
   - [Using Command Line Arguments](#using-command-line-arguments)
   - [Using a WandB Config File](#using-a-wandb-config-file)
@@ -81,7 +84,7 @@ Follow these steps to set up your environment and install all necessary dependen
 
    To retrieve the dataset required for this project, follow these detailed steps:
 
-### Based on the Work Here
+**Based on the Work Here**
    Refer to the article [Two excited-state datasets for quantum chemical UV-vis spectra of organic molecules](https://www.nature.com/articles/s41597-023-02408-4#Sec10).
 
 ### Steps to Download the Dataset
@@ -121,6 +124,12 @@ Follow these steps to set up your environment and install all necessary dependen
       ```
 
    By following these steps, you will be able to download the dataset required for this project.
+
+### Preprocess the dataset and prepare it before training the model
+    Before training and running the model the data has tho be prepared, do so by running `preprocess.py`
+    ```
+      python -m src.processing.preprocess
+    ```
 
 ## Training the Model
    Train the model using command line arguments or using a WandB configuration file. You can 
