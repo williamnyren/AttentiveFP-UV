@@ -41,6 +41,7 @@ import numpy as np
 import time
 import random
 import logging
+import pickle
 
 
 # Check for config_spectra.yml
@@ -56,31 +57,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 ## Uncomment to enable anomaly detection
 #torch.autograd.set_detect_anomaly(True)
 
-"""
- Some file paths for different systems used in the development of the project.
- WORKSPACE_PATH: Path to the workspace directory where the data is stored while traning a model.
- PERISTENT_STORAGE_PATH: Path to the directory where the models are stored after training.
-"""
-##GTX 1650
-#WORKSPACE_PATH = '/home/nyrenw/Documents/Thesis/AttentiveFP/evo970/workspace'
-#PERSISTENT_STORAGE_PATH = '/home/nyrenw/Documents/Thesis/AttentiveFP'
-WORKSPACE_PATH = '/home/nyrenw/AttentiveFP-UV/data/workspace'
-PERSISTENT_STORAGE_PATH = '/home/nyrenw/AttentiveFP-UV'
-## RTX 4090
-#WORKSPACE_PATH = '/home/nyrenw/Documents/workspace'
-#PERSISTENT_STORAGE_PATH = '/home/nyrenw/Documents/AttentiveFP'
 
-## RTX 6000
-#WORKSPACE_PATH = '/home/nyrenw/Documents/workspace/AttentiveFP'
-#PERSISTENT_STORAGE_PATH = '/home/nyrenw/Documents/AttentiveFP'
-
-## Server. Storage in RAM
-#WORKSPACE_PATH = ['/dev/shm/workspace', '/dev/shm/workspace', '/sys/fs/cgroup/workspace', '/sys/fs/cgroup/workspace']
-#PERSISTENT_STORAGE_PATH = '/data/William/AttentiveFP'
-
-## RTX 3090
-#WORKSPACE_PATH = '/media/nyrenw/workspace/data'
-#PERSISTENT_STORAGE_PATH = '/media/nyrenw/AttentiveFP'
+WORKSPACE_PATH = params.WORKSPACE_PATH
+PERSISTENT_STORAGE_PATH = params.PERSISTENT_STORAGE_PATH
 
 
 default_config = {
@@ -193,7 +172,14 @@ def setup_wandb(config, rank):
 
 def load_model(model, total_epochs, map_location=None, checkpoint_file=None, rank=0):
     assert map_location is not None
-    checkpoint_file = os.path.join(PERSISTENT_STORAGE_PATH, 'models', f'checkpoint_{checkpoint_file}.pt')
+    checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models', checkpoint_file)
+    # Make directory if it does not exist
+    if not os.path.exists(checkpoint_path):
+        os.makedirs(checkpoint_path, exist_ok=True)
+
+    with open(os.path.join(checkpoint_path, f'config_{checkpoint_file}.pkl'), 'rb') as f:
+        config = pickle.load(f)
+    checkpoint_file = os.path.join(checkpoint_path, f'checkpoint_{checkpoint_file}.pt')
     checkpoint = torch.load(checkpoint_file, map_location=map_location)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(map_location)
@@ -204,9 +190,9 @@ def load_model(model, total_epochs, map_location=None, checkpoint_file=None, ran
     logging.info(f'Loaded model from checkpoint: {file}')
     if rank == 0:
         #best_val_metric = checkpoint['loss']
-        return model, optimizer, epoch, total_epochs, 999999#best_val_metric
+        return model, optimizer, epoch, total_epochs, 999999, config#best_val_metric
     else:
-        return model, optimizer, epoch, total_epochs
+        return model, optimizer, epoch, total_epochs, config
     
 def maximize_batch_size(rank, result_queue):
     ddp_setup(rank, 1)
@@ -263,44 +249,46 @@ class SpectralTrainer:
         dist.barrier()
         if config['run_id'] is not None:
             if rank == 0:
-                model, self.optimizer, self.epoch, self.total_epochs, self.best_val_acc= load_model(model, 
+                model, self.optimizer, self.epoch, self.total_epochs, self.best_val_acc, self.config = load_model(model, 
                                                                                                     self.total_epochs,
                                                                                                     self.device,
                                                                                                     checkpoint_file=self.config['run_id'],
                                                                                                     rank=self.rank
                                                                                                     )
+                config = self.config
             else:
-                model, self.optimizer, self.epoch, self.total_epochs = load_model(model, 
+                model, self.optimizer, self.epoch, self.total_epochs, self.config = load_model(model, 
                                                                                   self.total_epochs,
                                                                                   self.device,
                                                                                   checkpoint_file=self.config['run_id'],
                                                                                   rank=self.rank
                                                                                   )
+                config = self.config
             self.model = model.to(rank)
         else:               
             self.model = model.to(rank)
             self.optimizer = torch.optim.AdamW(model.parameters(), lr=config['lr'], weight_decay=4.e-4)
         self.model = DDP(model, device_ids=[rank])
         self.setup_data_loaders()
-        self.scheduler = build_lr_scheduler(self.optimizer, config, self.num_train_samples)
-        self.loss_function = get_spectral_fn(config['loss_function'], epoch = self.epoch, warmup_epochs = self.warmup_epochs)
-        self.metric = get_spectral_fn(config['metric'])
+        self.scheduler = build_lr_scheduler(self.optimizer, self.config, self.num_train_samples)
+        self.loss_function = get_spectral_fn(self.config['loss_function'], epoch = self.epoch, warmup_epochs = self.warmup_epochs)
+        self.metric = get_spectral_fn(self.config['metric'])
         self.filters = []
-        for deriv in config['savitzkey_golay']:
+        for deriv in self.config['savitzkey_golay']:
             logging.info(f"Initializing Savitzkey Golay filter with deriv={deriv}")
             if deriv == 0:
                 continue
-            self.filters.append(initialize_savgol_filter(self.device, window_length=config['window_length'],
-                                                         polyorder=config['polyorder'], deriv=deriv,
-                                                         padding=config['padding']))
+            self.filters.append(initialize_savgol_filter(self.device, window_length=self.config['window_length'],
+                                                         polyorder=self.config['polyorder'], deriv=deriv,
+                                                         padding=self.config['padding']))
 
         
 
     def setup_data_loaders(self):
-        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['train'], split='train', one_hot=self.config['one_hot'], config=self.config)
+        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
+        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
         self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
@@ -465,10 +453,16 @@ class SpectralTrainer:
             dist.barrier()
         return
     # Change the path to save the checkpoint
-    def save_checkpoint(self, epoch):
+    def save_checkpoint(self, epoch, config):
         assert self.rank == 0
+        
         checkpoint_file = self.run_wandb.id
-        checkpoint_file = os.path.join(PERSISTENT_STORAGE_PATH, 'models', f'checkpoint_{checkpoint_file}.pt')
+        checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models')
+
+        with open(os.path.join(checkpoint_path, checkpoint_file, f'config_{checkpoint_file}.pkl'), 'wb') as f:
+            pickle.dump(config, f)
+        
+        checkpoint_file = os.path.join(checkpoint_path, checkpoint_file, f'checkpoint_{checkpoint_file}.pt')
         ckp_m = self.model.module.state_dict()
         ckp_op = self.optimizer.state_dict()
         torch.save({'epoch': epoch,

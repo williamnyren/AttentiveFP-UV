@@ -4,7 +4,7 @@ program: 'train_ddp.py'
 method: 'random'
 
 # Project this sweep is part of
-project: 'sweep_large'
+project: 'example_project'
 entity: 'nyrenw'
 
 # Metric to optimize
@@ -17,9 +17,9 @@ parameters:
   lr: 
     values: [0.0001]
   hidden_channels:
-    values: [250]
+    values: [150, 250]
   num_layers:
-    values: [4]
+    values: [2, 4]
   num_timesteps:
     values: [2]
   dropout:
@@ -27,13 +27,13 @@ parameters:
   num_workers:
     value: 3
   total_epochs:
-    value: 50
+    value: 20
   warmup_epochs:
-    value: 2
+    value: 3
   batch_size:
     values: [0]
   Attention_mode:
-    values: ['GATv2']
+    values: ['MoGATv2']
   heads: 
     values: [3]
   loss_function:
