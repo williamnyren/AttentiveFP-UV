@@ -173,9 +173,6 @@ def setup_wandb(config, rank):
 def load_model(model, total_epochs, map_location=None, checkpoint_file=None, rank=0):
     assert map_location is not None
     checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models', checkpoint_file)
-    # Make directory if it does not exist
-    if not os.path.exists(checkpoint_path):
-        os.makedirs(checkpoint_path, exist_ok=True)
 
     with open(os.path.join(checkpoint_path, f'config_{checkpoint_file}.pkl'), 'rb') as f:
         config = pickle.load(f)
@@ -458,6 +455,10 @@ class SpectralTrainer:
         
         checkpoint_file = self.run_wandb.id
         checkpoint_path = os.path.join(PERSISTENT_STORAGE_PATH, 'models')
+        
+        # Make directory if it does not exist
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(os.path.join(checkpoint_path, checkpoint_file), exist_ok=True)
 
         with open(os.path.join(checkpoint_path, checkpoint_file, f'config_{checkpoint_file}.pkl'), 'wb') as f:
             pickle.dump(config, f)
