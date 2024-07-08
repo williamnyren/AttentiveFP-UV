@@ -126,7 +126,7 @@ Follow these steps to set up your environment and install all necessary dependen
    By following these steps, you will be able to download the dataset required for this project.
 
 ### Preprocess the dataset and prepare it before training the model
-    Before training and running the model the data has to be prepared, do so by running `preprocess.py`
+  Before training and running the model the data has to be prepared, do so by running `preprocess.py`
    ``` 
       python -m src.processing.preprocess
    ```
