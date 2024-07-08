@@ -1,10 +1,10 @@
 data
-data/
+data/*
 wandb
-wandb/
+wandb/*
 ORNL_data
-ORNL_data/
+ORNL_data/*
 models
-models/
+models/*
 plots
-plots/
+plots/*
