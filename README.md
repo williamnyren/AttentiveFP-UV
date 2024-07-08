@@ -126,10 +126,10 @@ Follow these steps to set up your environment and install all necessary dependen
    By following these steps, you will be able to download the dataset required for this project.
 
 ### Preprocess the dataset and prepare it before training the model
-    Before training and running the model the data has tho be prepared, do so by running `preprocess.py`
-    ```
+    Before training and running the model the data has to be prepared, do so by running `preprocess.py`
+   ``` 
       python -m src.processing.preprocess
-    ```
+   ```
 
 ## Training the Model
    Train the model using command line arguments or using a WandB configuration file. You can 
@@ -137,69 +137,56 @@ Follow these steps to set up your environment and install all necessary dependen
    Override the default parameters directly through command line arguments.
    Defaults:
    ```
-   default_config = {
-      'lr': 5e-4,
-      'hidden_channels': 250,
-      'num_layers': 4,
-      'num_timesteps': 2,
-      'dropout': 0.025,
-      'seed': None,
-      'num_workers': 4,
-      'total_epochs': 10,
-      'warmup_epochs': 1,
-      'run_id': None,
-      'batch_size': 0,
-      'Attention_mode': 'GAT',
-      'heads': 2,
-      'loss_function': 'mse_loss',
-      'metric': 'srmse',
-      'savitzkey_golay': [],
-      'window_length': 5,
-      'polyorder': 3,
-      'padding': True,
-      'lr_ddp_scaling': 0,
-      'batch_ddp_scaling': 1,
-      'with_fake_edges': 0,
-      'LOSS_FUNCTION': '',
-      'METRIC_FUNCTION': 'srmse',
-      'NUM_PROCESSES': 1,
-      'DATA_DIRECTORY': 'data'
-   }
+     default_config = {
+        'lr': 5e-4,
+        'hidden_channels': 250,
+        'num_layers': 4,
+        'num_timesteps': 2,
+        'dropout': 0.025,
+        'seed': None,
+        'num_workers': 4,
+        'total_epochs': 10,
+        'warmup_epochs': 1,
+        'run_id': None,
+        'batch_size': 0,
+        'Attention_mode': 'GAT',
+        'heads': 2,
+        'loss_function': 'mse_loss',
+        'metric': 'srmse',
+        'savitzkey_golay': [],
+        'window_length': 5,
+        'polyorder': 3,
+        'padding': True,
+        'lr_ddp_scaling': 0,
+        'batch_ddp_scaling': 1,
+        'with_fake_edges': 0,
+        'LOSS_FUNCTION': '',
+        'METRIC_FUNCTION': 'srmse',
+        'NUM_PROCESSES': 1,
+        'DATA_DIRECTORY': 'data'
+     }
+  
+        --lr', type=float, default=default_config['lr'], help='Learning rate')
+        --hidden_channels', type=int, default=default_config['hidden_channels'], help='Hidden channels')
+        --num_layers', type=int, default=default_config['num_layers'], help='Number of layers')
+        --num_timesteps', type=int, default=default_config['num_timesteps'], help='Number of timesteps')
+        --dropout', type=float, default=default_config['dropout'], help='Dropout')
+        --seed', type=int, default=default_config['seed'], help='Seed')
+        --num_workers', type=int, default=default_config['num_workers'], help='Number of workers')
+        --run_id', type=str, default=default_config['run_id'], help='Run ID for resuming training')
+        --total_epochs', type=int, default=default_config['total_epochs'], help='Number of epochs to train')
+        --batch_size', type=int, default=default_config['batch_size'], help='Batch size')
+        --Attention_mode', type=str, default=default_config['Attention_mode'], help='Attention mode')
+        --heads', type=int, default=default_config['heads'], help='Number of heads')
+        --loss_function', type=str, default=default_config['loss_function'], help='Loss function')
+        --metric', type=str, default=default_config['metric'], help='Metric')
+        --savitzkey_golay', type=list, default=default_config['savitzkey_golay'], help='Savitzkey Golay filter')
+        --with_fake_edges', type=int, default=default_config['with_fake_edges'], help='Data with fake edges')
+        --DATA_DIRECTORY', type=str, default=default_config['DATA_DIRECTORY'], help='Data directory')
+        --lr_ddp_scaling, type=int, default=default_config['lr_ddp_scaling'], help='Scale learning rate with number of GPUs')
+        --batch_ddp_scaling, type=int, default=default_config['batch_ddp_scaling'], help='Scale batch size with number of GPUs')
+        --warmup_epochs, type=int, default=default_config['warmup_epochs'], help='Warmup epochs')
 
-   def parse_args():
-      "Overriding default parameters"
-      argparser = argparse.ArgumentParser(description='Process hyperparameters')
-      argparser.add_argument('--lr', type=float, default=default_config['lr'], help='Learning rate')
-      argparser.add_argument('--hidden_channels', type=int, default=default_config['hidden_channels'], help='Hidden channels')
-      argparser.add_argument('--num_layers', type=int, default=default_config['num_layers'], help='Number of layers')
-      argparser.add_argument('--num_timesteps', type=int, default=default_config['num_timesteps'], help='Number of timesteps')
-      argparser.add_argument('--dropout', type=float, default=default_config['dropout'], help='Dropout')
-      argparser.add_argument('--seed', type=int, default=default_config['seed'], help='Seed')
-      argparser.add_argument('--num_workers', type=int, default=default_config['num_workers'], help='Number of workers')
-      argparser.add_argument('--run_id', type=str, default=default_config['run_id'], help='Run ID for resuming training')
-      argparser.add_argument('--total_epochs', type=int, default=default_config['total_epochs'], help='Number of epochs to train')
-      argparser.add_argument('--batch_size', type=int, default=default_config['batch_size'], help='Batch size')
-      argparser.add_argument('--Attention_mode', type=str, default=default_config['Attention_mode'], help='Attention mode')
-      argparser.add_argument('--heads', type=int, default=default_config['heads'], help='Number of heads')
-      argparser.add_argument('--loss_function', type=str, default=default_config['loss_function'], help='Loss function')
-      argparser.add_argument('--metric', type=str, default=default_config['metric'], help='Metric')
-      argparser.add_argument('--savitzkey_golay', type=list, default=default_config['savitzkey_golay'], help='Savitzkey Golay filter')
-      argparser.add_argument('--with_fake_edges', type=int, default=default_config['with_fake_edges'], help='Data with fake edges')
-      argparser.add_argument('--DATA_DIRECTORY', type=str, default=default_config['DATA_DIRECTORY'], help='Data directory')
-      argparser.add_argument('--lr_ddp_scaling', type=int, default=default_config['lr_ddp_scaling'], help='Scale learning rate with number of GPUs')
-      argparser.add_argument('--batch_ddp_scaling', type=int, default=default_config['batch_ddp_scaling'], help='Scale batch size with number of GPUs')
-      argparser.add_argument('--warmup_epochs', type=int, default=default_config['warmup_epochs'], help='Warmup epochs')
-      args = argparser.parse_args()
-      for arg in vars(args):
-         default_config[arg] = args.__dict__[arg]
-      default_config['LOSS_FUNCTION'] = default_config['loss_function']
-      default_config['METRIC_FUNCTION'] = default_config['metric']
-      if default_config['with_fake_edges'] == 1:
-         default_config['DATA_DIRECTORY'] = 'data_add_fake_edges'    
-      default_config['out_dim'] = config_spectra['out_dim']
-      default_config['split'] = [config_spectra['split_train'], config_spectra['split_val'], config_spectra['split_test']]
-      default_config['one_hot'] = config_spectra['one_hot']
-      return
    ```
 
    Run the script with your desired parameters:
