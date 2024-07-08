@@ -8,8 +8,8 @@
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Retrieving the Dataset](#retrieving-the-dataset)
-  -[Steps to Download the Dataset](#download-the-dataset) 
-  -[Preprocess the dataset and prepare it before training the model](#preprocess-the-dataset) 
+  - [Steps to Download the Dataset](#download-the-dataset) 
+  - [Preprocess the dataset and prepare it before training the model](#preprocess-the-dataset) 
 
 - [Training the Model](#training-the-model)
   - [Using Command Line Arguments](#using-command-line-arguments)
