@@ -107,9 +107,20 @@ Follow these steps to set up your environment and install all necessary dependen
       - Navigate to the file you want to download from Globus via the references mentioned above.
       - Select a directory on your local system where you want to transfer the files.
       - Follow the instructions in the Globus app to initiate and complete the file transfer.
+   
+   6. **Extract data files and direcories**
+      - Extract the two files transfered from Globus and put them in to the directory `ORNL_data`
+      ```
+         - ORNL_data
+            - extracted
+               - gdb9_ex.csv
+               - ornl_aisd_ex_1.csv
+               - ornl_aisd_ex_2.csv
+               - ...
+               - ornl_aisd_ex_1000.csv
+      ```
 
    By following these steps, you will be able to download the dataset required for this project.
-
 
 ## Training the Model
    Train the model using command line arguments or using a WandB configuration file. You can 
@@ -199,8 +210,8 @@ Follow these steps to set up your environment and install all necessary dependen
       method: 'random'
 
       # Project this sweep is part of
-      project: 'sweep_large'
-      entity: 'nyrenw'
+      project: 'example_project'
+      entity: <WANDB_USER>
 
       # Metric to optimize
       metric:
@@ -245,3 +256,13 @@ Follow these steps to set up your environment and install all necessary dependen
       #    values: [42, 13, 7]
    ```
    
+   With a configuration file setup, we are now able to utilize the W&B sweep functionality.
+   ```
+      wandb sweep config.yaml
+   ```
+   You should now recive a <sweep-ID> in the terminal. THe project and sweep should also be pressent on you W&B page.
+
+   We are now able to start a new run in the sweep:
+   ```
+      wandb agent <WANDB_USER>/example_project/<sweep-ID>
+   ```

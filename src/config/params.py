@@ -1,2 +1,2 @@
-WANDB_PROJECT = 'sweep_large'
+WANDB_PROJECT = 'example_project'
 ENTITY = 'nyrenw'

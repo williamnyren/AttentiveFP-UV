@@ -267,7 +267,7 @@ def filter_and_load_smiles(raw_data, num_cpus, force_recreate):
     return df_all
 
 def filter_smiles(raw_data, num_cpus):
-    raw_data_tmp = os.path.join(raw_data, 'post_data')
+    raw_data_tmp = os.path.join(raw_data, 'extracted')
     df_small = pd.read_csv(os.path.join(raw_data_tmp, 'gdb9_ex.csv'))
     files = [f for f in os.listdir(raw_data_tmp) if 'ornl_aisd_ex_' in f]
     dfs_large = [pd.read_csv(os.path.join(raw_data_tmp, f)) for f in files]
