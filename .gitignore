@@ -1,5 +1,10 @@
+data
 data/
+wandb
 wandb/
+ORNL_data
 ORNL_data/
+models
 models/
+plots
 plots/
