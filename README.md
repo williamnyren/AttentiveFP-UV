@@ -59,7 +59,7 @@ Follow these steps to set up your environment and install all necessary dependen
 
    ```bash
       conda env create -f environment.yml
-      conda activate attentive_fp_test
+      conda activate attentive_fp
    ```
 
 
@@ -149,7 +149,7 @@ Follow these steps to set up your environment and install all necessary dependen
         'warmup_epochs': 1,
         'run_id': None,
         'batch_size': 0,
-        'Attention_mode': 'GAT',
+        'Attention_mode': 'MoGATv2',
         'heads': 2,
         'loss_function': 'mse_loss',
         'metric': 'srmse',
