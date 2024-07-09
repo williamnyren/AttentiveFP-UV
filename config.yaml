@@ -41,7 +41,7 @@ parameters:
   heads: 
     values: [3]
   loss_function:
-    values: ['mse_loss', 'sid', 'kl_div']
+    values: ['mse_loss']
   with_fake_edges: 
     value: 0
   lr_ddp_scaling:
