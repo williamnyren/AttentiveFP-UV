@@ -7,5 +7,6 @@ ORNL_data/*
 models/*
 plots
 plots/*
+plots/
 **/__pycache__/
 !src/**/__pycache__/
