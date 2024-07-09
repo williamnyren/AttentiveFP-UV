@@ -15,29 +15,33 @@ metric:
 # Parameters search space
 parameters:
   lr: 
-    values: [0.0001]
+    values: [0.0005]
+  init_lr:
+    values: [0.0000001]
+  final_lr:
+    values: [0.00001]
   hidden_channels:
-    values: [150, 250]
+    values: [150, 250, 300]
   num_layers:
-    values: [2, 4]
+    values: [2, 4, 8]
   num_timesteps:
-    values: [2]
+    values: [1, 3]
   dropout:
     values: [0.025]
   num_workers:
     value: 3
   total_epochs:
-    value: 20
+    value: 10
   warmup_epochs:
     value: 3
   batch_size:
-    values: [0]
+    values: [0, 150]
   Attention_mode:
-    values: ['MoGATv2']
+    values: ['GAT', 'DenseGAT', 'GATv2', 'MoGAT', 'MoGATv2']
   heads: 
     values: [3]
   loss_function:
-    values: ['mse_loss']
+    values: ['mse_loss', 'sid', 'kl_div']
   with_fake_edges: 
     value: 0
   lr_ddp_scaling:
@@ -45,6 +49,6 @@ parameters:
   batch_ddp_scaling:
     value: 1
   savitzkey_golay:
-    values: [0]
+    values: [0, [1, 2], [1], [2]]
 #  seed:
 #    values: [42, 13, 7]

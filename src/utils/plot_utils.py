@@ -21,7 +21,8 @@ def make_density_plot(df, config, script_path):
     quantiles = []
     quantiles_lst = [0.25, 0.5, 0.75, 0.95]
     # Use a subsample of the data to speed up the plot
-    #df = df.sample(n=15000)
+    num_samples = df.shape[0]
+    df = df.sample(n=int(num_samples*0.1)+1)
     for q in quantiles_lst: 
         quantiles.append(df['loss'].quantile(q))
     mean = df['loss'].mean()

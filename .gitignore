@@ -8,3 +8,4 @@ models
 models/*
 plots
 plots/*
+__pycache__

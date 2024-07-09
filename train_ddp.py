@@ -486,6 +486,7 @@ def load_config_and_initialize(rank: int, config: dict):
     os.makedirs(os.path.join(process_dir, 'plots'), exist_ok=True)
     os.makedirs(os.path.join(process_dir, 'models'), exist_ok=True)
     
+    logging.info(os.path.join(process_dir, config['DATA_DIRECTORY'], 'train', 'data', 'processed', 'sqlite.db'))
     if not os.path.exists(os.path.join(process_dir, config['DATA_DIRECTORY'], 'train', 'data', 'processed', 'sqlite.db')):
         persistent_data = os.path.join(PERSISTENT_STORAGE_PATH, config['DATA_DIRECTORY'])
         logging.info(f"Copying data from {persistent_data} to {process_dir}")
