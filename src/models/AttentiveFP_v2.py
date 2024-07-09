@@ -129,7 +129,7 @@ class AttentiveFP(torch.nn.Module):
                 self.atom_grus.append(GRUCell(hidden_channels, hidden_channels))
             else:
                 raise NotImplementedError
-        if attention_mode in ['DensityGAT', 'GATv2', 'GAT']:
+        if attention_mode in ['DenseGAT', 'GATv2', 'GAT']:
             self.mol_conv = Attention_mechanism_mol(hidden_channels, hidden_channels, heads=heads, concat=False, add_self_loops=False, dropout=dropout, negative_slope=0.01)
             self.mol_conv.explain = False
             self.mol_gru = GRUCell(hidden_channels, hidden_channels)
