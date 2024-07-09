@@ -119,7 +119,7 @@ def parse_args():
     argparser.add_argument('--heads', type=int, default=default_config['heads'], help='Number of heads')
     argparser.add_argument('--loss_function', type=str, default=default_config['loss_function'], help='Loss function')
     argparser.add_argument('--metric', type=str, default=default_config['metric'], help='Metric')
-    argparser.add_argument('--savitzkey_golay', type=list, default=default_config['savitzkey_golay'], help='Savitzkey Golay filter')
+    argparser.add_argument('--savitzkey_golay', type=list, default=default_config['savitzkey_golay'], help='Order of derivatives for Savitzkey Golay filter')
     argparser.add_argument('--with_fake_edges', type=int, default=default_config['with_fake_edges'], help='Data with fake edges')
     argparser.add_argument('--DATA_DIRECTORY', type=str, default=default_config['DATA_DIRECTORY'], help='Data directory')
     argparser.add_argument('--lr_ddp_scaling', type=int, default=default_config['lr_ddp_scaling'], help='Scale learning rate with number of GPUs')
