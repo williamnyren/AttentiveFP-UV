@@ -62,7 +62,6 @@ def srmse(model_spectra: torch.tensor, target_spectra: torch.tensor, threshold: 
 
 
 def mse_loss(model_spectra, target_spectra, threshold: float = 1e-8, eps: float = 1e-8, torch_device = torch.device('cpu')):
-
     target_spectra = target_spectra/(torch.max(target_spectra, dim=1, keepdim=True)[0]+eps)
 
     target_spectra = torch.sqrt(target_spectra)
@@ -98,7 +97,7 @@ def normalize_spectra(model_spectra: torch.tensor, target_spectra: torch.tensor,
 
 def kl_div_scipy(model_spectra: torch.tensor, target_spectra: torch.tensor, threshold: float = 1e-8, eps: float = 1e-8, torch_device = torch.device('cpu')) -> torch.tensor:
     # Normalize the spectra
-    target_spectra = target_spectra/torch.max(target_spectra, dim=1, keepdim=True)[0]
+    target_spectra = target_spectra/(torch.max(target_spectra, dim=1, keepdim=True)[0]+eps)
     target_spectra = torch.sqrt(target_spectra)
     
     model_spectra, target_spectra, nan_mask = normalize_spectra(model_spectra, target_spectra, threshold, eps, torch_device)
