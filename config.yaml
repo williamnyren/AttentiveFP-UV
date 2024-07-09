@@ -49,6 +49,6 @@ parameters:
   batch_ddp_scaling:
     value: 1
   savitzkey_golay:
-    values: [0, 1 2, 1, 2]
+    values: [0]
 #  seed:
 #    values: [42, 13, 7]
