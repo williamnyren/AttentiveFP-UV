@@ -14,6 +14,7 @@
 - [Training the Model](#training-the-model)
   - [Using Command Line Arguments](#using-command-line-arguments)
   - [Using a WandB Config File](#using-a-wandb-config-file)
+  - [Necessary modifications](#necessary-modifications)
 
 
 ## Project Overview
