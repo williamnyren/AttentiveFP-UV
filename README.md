@@ -260,3 +260,6 @@ Follow these steps to set up your environment and install all necessary dependen
    ```
       wandb agent <WANDB_USER>/example_project/<sweep-ID>
    ```
+### Necessary modifications 
+  The final step to get everything operational is to edit path variables and potential variables related to the `wandb` setup.
+  This is changes are done in `src/config/params.py`.
