@@ -282,10 +282,10 @@ class SpectralTrainer:
         
 
     def setup_data_loaders(self):
-        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        self.train_data = DatasetAttentiveFP(root=self.dataset_paths['train'], split='train', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of training samples: {len(self.train_data)}')
         self.num_train_samples = len(self.train_data)
-        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
+        self.val_data = DatasetAttentiveFP(root=self.dataset_paths['val'], split='val', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of validation samples: {len(self.val_data)}')
         self.test_data = DatasetAttentiveFP(root=self.dataset_paths['test'], split='test', one_hot=self.config['one_hot'], config=self.config)
         logging.info(f'Number of test samples: {len(self.test_data)}')
