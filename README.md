@@ -192,7 +192,7 @@ Follow these steps to set up your environment and install all necessary dependen
 
    Run the script with your desired parameters:
    ```
-      python train.py --lr 0.001 --hidden_channels 256 --num_layers 6
+      python train_ddp.py --lr 0.001 --hidden_channels 256 --num_layers 6
    ```
 
 ### Using a WandB Config File
