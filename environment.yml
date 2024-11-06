@@ -1,4 +1,4 @@
-name: attentive_fp_git
+name: attentive_fp
 channels:
   - defaults
 dependencies:
